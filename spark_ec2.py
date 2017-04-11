@@ -463,6 +463,8 @@ EC2_INSTANCE_TYPES = {
     "r3.2xlarge":  "hvm",
     "r3.4xlarge":  "hvm",
     "r3.8xlarge":  "hvm",
+    "r4.4xlarge":  "hvm",
+    "r4.8xlarge":  "hvm",
     "t1.micro":    "pvm",
     "t2.micro":    "hvm",
     "t2.small":    "hvm",
@@ -958,7 +960,7 @@ def wait_for_cluster_state(conn, opts, cluster_instances, cluster_state):
     sys.stdout.flush()
 
     start_time = datetime.now()
-    num_attempts = 0
+    num_attempts = 1
 
     while True:
         time.sleep(5 * num_attempts)  # seconds
@@ -982,7 +984,7 @@ def wait_for_cluster_state(conn, opts, cluster_instances, cluster_state):
             if all(i.state == cluster_state for i in cluster_instances):
                 break
 
-        num_attempts += 1
+        #num_attempts += 1
 
         sys.stdout.write(".")
         sys.stdout.flush()
@@ -1051,6 +1053,8 @@ def get_num_disks(instance_type):
         "r3.2xlarge":  1,
         "r3.4xlarge":  1,
         "r3.8xlarge":  2,
+        "r4.4xlarge":  0,
+        "r4.8xlarge":  0,
         "t1.micro":    0,
         "t2.micro":    0,
         "t2.small":    0,
