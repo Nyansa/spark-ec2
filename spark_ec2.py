@@ -109,8 +109,8 @@ DEFAULT_SPARK_VERSION = SPARK_EC2_VERSION
 DEFAULT_SPARK_GITHUB_REPO = "https://github.com/apache/spark"
 
 # Default location to get the spark-ec2 scripts (and ami-list) from
-DEFAULT_SPARK_EC2_GITHUB_REPO = "https://github.com/amplab/spark-ec2"
-DEFAULT_SPARK_EC2_BRANCH = "branch-2.0"
+DEFAULT_SPARK_EC2_GITHUB_REPO = "https://github.com/Nyansa/spark-ec2"
+DEFAULT_SPARK_EC2_BRANCH = "nyansa-2.0"
 
 
 def setup_external_libs(libs):
@@ -258,7 +258,7 @@ def parse_args():
         "--ebs-vol-size", metavar="SIZE", type="int", default=0,
         help="Size (in GB) of each EBS volume.")
     parser.add_option(
-        "--ebs-vol-type", default="standard",
+        "--ebs-vol-type", default="gp2",
         help="EBS volume type (e.g. 'gp2', 'standard').")
     parser.add_option(
         "--ebs-vol-num", type="int", default=1,
@@ -458,6 +458,7 @@ EC2_INSTANCE_TYPES = {
     "m4.2xlarge":  "hvm",
     "m4.4xlarge":  "hvm",
     "m4.10xlarge": "hvm",
+    "m4.16xlarge": "hvm",
     "r3.large":    "hvm",
     "r3.xlarge":   "hvm",
     "r3.2xlarge":  "hvm",
@@ -846,8 +847,8 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
             print(slave_address)
             ssh_write(slave_address, opts, ['tar', 'x'], dot_ssh_tar)
 
-    modules = ['spark', 'ephemeral-hdfs', 'persistent-hdfs',
-               'mapreduce', 'spark-standalone', 'tachyon', 'rstudio']
+    modules = ['spark', 'ephemeral-hdfs',
+               'mapreduce', 'spark-standalone']
 
     if opts.hadoop_major_version == "1":
         modules = list(filter(lambda x: x != "mapreduce", modules))
@@ -1048,6 +1049,7 @@ def get_num_disks(instance_type):
         "m4.2xlarge":  0,
         "m4.4xlarge":  0,
         "m4.10xlarge": 0,
+        "m4.16xlarge": 0,
         "r3.large":    1,
         "r3.xlarge":   1,
         "r3.2xlarge":  1,
@@ -1079,15 +1081,26 @@ def get_num_disks(instance_type):
 def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, modules):
     active_master = get_dns_name(master_nodes[0], opts.private_ips)
 
-    num_disks = get_num_disks(opts.instance_type)
-    hdfs_data_dirs = "/mnt/ephemeral-hdfs/data"
-    mapred_local_dirs = "/mnt/hadoop/mrlocal"
-    spark_local_dirs = "/mnt/spark"
+    if opts.ebs_vol_size > 0:
+        num_disks = opts.ebs_vol_num
+        mnt_dir = "vol"
+        mnt_base_dir = "vol0"
+    else:
+        num_disks = get_num_disks(opts.instance_type)
+        mnt_dir = "mnt"
+        mnt_base_dir = "mnt"
+
+    hdfs_data_dirs = "/%s/ephemeral-hdfs/data" % mnt_base_dir
+    mapred_local_dirs = "/%s/hadoop/mrlocal" % mnt_base_dir
+    spark_local_dirs = "/%s/spark" % mnt_base_dir
+    hadoop_tmp_dir = "/%s/ephemeral-hdfs" % mnt_base_dir
+    hadoop_log_dir = "/%s/ephemeral-hdfs/logs" % mnt_base_dir
+
     if num_disks > 1:
         for i in range(2, num_disks + 1):
-            hdfs_data_dirs += ",/mnt%d/ephemeral-hdfs/data" % i
-            mapred_local_dirs += ",/mnt%d/hadoop/mrlocal" % i
-            spark_local_dirs += ",/mnt%d/spark" % i
+            hdfs_data_dirs += ",/%s%d/ephemeral-hdfs/data" % (mnt_dir, i)
+            mapred_local_dirs += ",/%s%d/hadoop/mrlocal" % (mnt_dir, i)
+            spark_local_dirs += ",/%s%d/spark" % (mnt_dir, i)
 
     cluster_url = "%s:7077" % active_master
 
@@ -1103,7 +1116,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, modules):
 
     if tachyon_v == "":
       print("No valid Tachyon version found; Tachyon won't be set up")
-      modules.remove("tachyon")
+      #modules.remove("tachyon")
 
     master_addresses = [get_dns_name(i, opts.private_ips) for i in master_nodes]
     slave_addresses = [get_dns_name(i, opts.private_ips) for i in slave_nodes]
@@ -1116,6 +1129,8 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, modules):
         "hdfs_data_dirs": hdfs_data_dirs,
         "mapred_local_dirs": mapred_local_dirs,
         "spark_local_dirs": spark_local_dirs,
+        "hadoop_tmp_dir": hadoop_tmp_dir,
+        "hadoop_log_dir": hadoop_log_dir,
         "swap": str(opts.swap),
         "modules": '\n'.join(modules),
         "spark_version": spark_v,
