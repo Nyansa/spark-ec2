@@ -51,7 +51,7 @@ else:
     raw_input = input
     xrange = range
 
-SPARK_EC2_VERSION = "2.0.0"
+SPARK_EC2_VERSION = "1.6.3"
 SPARK_EC2_DIR = os.path.dirname(os.path.realpath(__file__))
 
 VALID_SPARK_VERSIONS = set([
@@ -722,6 +722,11 @@ def launch_cluster(conn, opts, cluster_name):
                       z=zone,
                       r=slave_res.id))
             i += 1
+
+    # Master does not require such a big EBS
+    if opts.ebs_vol_size > 0:
+        for key, device in block_map.iteritems():
+            device.size = 20
 
     # Launch or resume masters
     if existing_masters:
