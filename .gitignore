@@ -36,3 +36,12 @@ nosetests.xml
 
 # JetBrains products
 .idea/
+
+# Pycharm files
+.idea/*
+
+#Gradle files
+.gradle
+*/.gradle
+/build/
+*/build/

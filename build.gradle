@@ -1,0 +1,24 @@
+plugins {
+  id "nebula.ospackage" version "4.1.0"
+}
+
+ospackage {
+    packageName = 'voyance-sparkec2'
+    version = 'VERSION_STRING'
+    release = ''
+    arch = "amd64"
+    os = LINUX
+}
+
+buildDeb() {
+    preInstall file('deb/preInstall.sh')
+    postInstall file('deb/postInstall.sh')
+    preUninstall file('deb/preUninstall.sh')
+    postUninstall file('deb/postUninstall.sh')
+
+    into '/opt/voyance/voyance-sparkec2'
+    from ('ec2.tar') {
+        into '.'
+    }
+
+}
