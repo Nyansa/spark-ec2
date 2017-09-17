@@ -16,9 +16,7 @@ buildDeb() {
     preUninstall file('deb/preUninstall.sh')
     postUninstall file('deb/postUninstall.sh')
 
+    from ('ec2.tar')
     into '/opt/voyance/voyance-sparkec2'
-    from ('ec2.tar') {
-        into '.'
-    }
 
 }
