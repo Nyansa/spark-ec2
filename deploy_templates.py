@@ -71,6 +71,7 @@ template_vars = {
   "spark_worker_cores": "%d" %  worker_cores,
   "spark_master_opts": os.getenv("SPARK_MASTER_OPTS", ""),
   "spark_version": os.getenv("SPARK_VERSION"),
+  "scala_version": os.getenv("SCALA_VERSION"),
   "tachyon_version": os.getenv("TACHYON_VERSION"),
   "hadoop_major_version": os.getenv("HADOOP_MAJOR_VERSION"),
   "hadoop_tmp_dir": os.getenv("HADOOP_TMP_DIR"),
