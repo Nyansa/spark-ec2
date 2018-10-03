@@ -106,6 +106,7 @@ SPARK_TACHYON_MAP = {
 }
 
 DEFAULT_SPARK_VERSION = SPARK_EC2_VERSION
+DEFAULT_SCALA_VERSION = "2.10.3"
 DEFAULT_SPARK_GITHUB_REPO = "https://github.com/apache/spark"
 
 # Default location to get the spark-ec2 scripts (and ami-list) from
@@ -221,6 +222,9 @@ def parse_args():
     parser.add_option(
         "-v", "--spark-version", default=DEFAULT_SPARK_VERSION,
         help="Version of Spark to use: 'X.Y.Z' or a specific git hash (default: %default)")
+    parser.add_option(
+        "--scala-version", default=DEFAULT_SCALA_VERSION,
+        help="Scala version. Valid options are 2.10.3, 2.11.8. (default: %default)")
     parser.add_option(
         "--spark-git-repo",
         default=DEFAULT_SPARK_GITHUB_REPO,
@@ -1139,6 +1143,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, modules):
         "swap": str(opts.swap),
         "modules": '\n'.join(modules),
         "spark_version": spark_v,
+        "scala_version": opts.scala_version,
         "tachyon_version": tachyon_v,
         "hadoop_major_version": opts.hadoop_major_version,
         "spark_worker_instances": worker_instances_str,
