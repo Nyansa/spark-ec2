@@ -30,8 +30,19 @@ case "$HADOOP_MAJOR_VERSION" in
     cp /root/hadoop-native/* /root/ephemeral-hdfs/lib/native/
     ;;
   yarn)
-    wget http://s3-us-west-2.amazonaws.com/nyansa-spark-packages/hadoop-2.7.7.tar.gz
+    wget http://s3.amazonaws.com/spark-related-packages/hadoop-2.4.0.tar.gz
     echo "Unpacking Hadoop"
+    tar xvzf hadoop-*.tar.gz > /tmp/spark-ec2_hadoop.log
+    rm hadoop-*.tar.gz
+    mv hadoop-2.4.0/ ephemeral-hdfs/
+
+    # Have single conf dir
+    rm -rf /root/ephemeral-hdfs/etc/hadoop/
+    ln -s /root/ephemeral-hdfs/conf /root/ephemeral-hdfs/etc/hadoop
+    ;;
+  yarn2.7)
+    wget http://s3-us-west-2.amazonaws.com/nyansa-spark-packages/hadoop-2.7.7.tar.gz
+    echo "Unpacking Hadoop 2.7"
     tar xvzf hadoop-*.tar.gz > /tmp/spark-ec2_hadoop.log
     rm hadoop-*.tar.gz
     mv hadoop-2.*.*/ ephemeral-hdfs/
@@ -40,7 +51,6 @@ case "$HADOOP_MAJOR_VERSION" in
     rm -rf /root/ephemeral-hdfs/etc/hadoop/
     ln -s /root/ephemeral-hdfs/conf /root/ephemeral-hdfs/etc/hadoop
     ;;
-
   *)
      echo "ERROR: Unknown Hadoop version"
      return 1
