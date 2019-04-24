@@ -85,7 +85,8 @@ VALID_SPARK_VERSIONS = set([
     "2.0.2",
     "2.1.0",
     "2.3.3",
-    "2.4.0"
+    "2.4.0",
+    "2.4.1"
 ])
 
 SPARK_TACHYON_MAP = {
@@ -250,7 +251,7 @@ def parse_args():
              "(default: %default).")
     parser.add_option(
         "--hadoop-major-version", default="yarn",
-        help="Major version of Hadoop. Valid options are 1 (Hadoop 1.0.4), 2 (CDH 4.2.0), yarn, yarn2.7 (Hadoop 2.7.7)" +
+        help="Major version of Hadoop. Valid options are 1 (Hadoop 1.0.4), 2 (CDH 4.2.0), yarn, hadoop2.7.7 (Hadoop 2.7.7)" +
              "(Hadoop 2.4.0) (default: %default)")
     parser.add_option(
         "-D", metavar="[ADDRESS:]PORT", dest="proxy_port",
@@ -386,7 +387,7 @@ def validate_spark_hadoop_version(spark_version, hadoop_version):
         parts = spark_version.split(".")
         if parts[0].isdigit():
             spark_major_version = float(parts[0])
-            if spark_major_version > 1.0 and "yarn" not in hadoop_version:
+            if spark_major_version > 1.0 and "yarn" not in hadoop_version and "hadoop" not in hadoop_version:
               print("Spark version: {v}, does not support Hadoop version: {hv}".
                     format(v=spark_version, hv=hadoop_version), file=stderr)
               sys.exit(1)

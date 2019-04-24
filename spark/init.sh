@@ -1,11 +1,7 @@
 #!/bin/bash
 
 pushd /root > /dev/null
-
-if [ -d "spark" ]; then
-  echo "Spark seems to be installed. Exiting."
-  return
-fi
+rm -rf spark
 
 # Github tag:
 if [[ "$SPARK_VERSION" == *\|* ]]
@@ -132,8 +128,8 @@ else
       else
         if [[ "$SPARK_VERSION" == "1.6.3" ]] && [[ "$SCALA_VERSION" == 2.11* ]]; then
           wget http://s3-us-west-2.amazonaws.com/nyansa-spark-packages/spark-1.6.3-bin-hadoop2.4-scala2.11-apifix.tgz
-        elif [[ "$SPARK_VERSION" == "2.3.3" ]] && [[ "$SCALA_VERSION" == 2.11* ]]; then
-          wget http://s3-us-west-2.amazonaws.com/nyansa-spark-packages/spark-2.3.3-bin-hadoop2.7.tgz
+        elif [[ "SPARK_VERSION" == "2.3"* || "SPARK_VERSION" == "2.4"*  ]] ; then
+          wget http://s3.amazonaws.com/spark-related-packages/spark-$SPARK_VERSION-bin-hadoop2.7.tgz
         else
           wget http://s3.amazonaws.com/spark-related-packages/spark-$SPARK_VERSION-bin-hadoop2.4.tgz
         fi
