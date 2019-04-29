@@ -2,7 +2,6 @@
 
 pushd /root > /dev/null
 rm -rf spark
-SPARK_VERSION="2.3.3"
 # Github tag:
 if [[ "$SPARK_VERSION" == *\|* ]]
 then
