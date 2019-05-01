@@ -904,7 +904,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
         modules.append('ganglia')
 
     # Clear SPARK_WORKER_INSTANCES if running on YARN
-    if opts.hadoop_major_version == "yarn":
+    if opts.hadoop_major_version == "yarn" or "hadoop" in opts.hadoop_major_version:
         opts.worker_instances = ""
 
     # NOTE: We should clone the repository before running deploy_files to
