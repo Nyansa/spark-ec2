@@ -2,10 +2,8 @@
 
 pushd /root > /dev/null
 
-if [ -d "ephemeral-hdfs" ]; then
-  echo "Ephemeral HDFS seems to be installed. Exiting."
-  return 0
-fi
+pushd /root > /dev/null
+rm -rf ephemeral-hdfs
 
 case "$HADOOP_MAJOR_VERSION" in
   1)
@@ -40,7 +38,15 @@ case "$HADOOP_MAJOR_VERSION" in
     rm -rf /root/ephemeral-hdfs/etc/hadoop/
     ln -s /root/ephemeral-hdfs/conf /root/ephemeral-hdfs/etc/hadoop
     ;;
-
+  hadoop*)
+    wget http://s3-us-west-2.amazonaws.com/nyansa-spark-packages/$HADOOP_MAJOR_VERSION.tar.gz
+    echo "Unpacking $HADOOP_MAJOR_VERSION"
+    tar xvzf $HADOOP_MAJOR_VERSION.tar.gz > /tmp/spark-ec2_hadoop.log
+    rm $HADOOP_MAJOR_VERSION.tar.gz
+    mv $HADOOP_MAJOR_VERSION/ ephemeral-hdfs/
+    rm -rf /root/ephemeral-hdfs/etc/hadoop/
+    ln -s /root/ephemeral-hdfs/conf /root/ephemeral-hdfs/etc/hadoop
+    ;;
   *)
      echo "ERROR: Unknown Hadoop version"
      return 1
