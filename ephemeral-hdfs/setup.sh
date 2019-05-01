@@ -36,7 +36,7 @@ case "$HADOOP_MAJOR_VERSION" in
   2)
     $EPHEMERAL_HDFS/sbin/start-dfs.sh
     ;;
-  yarn) 
+  yarn|hadoop*)
     $EPHEMERAL_HDFS/sbin/start-dfs.sh
     echo "Starting YARN"
     $EPHEMERAL_HDFS/sbin/start-yarn.sh
