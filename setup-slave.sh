@@ -53,6 +53,30 @@ if [[ $instance_type == r3* || $instance_type == i2* || $instance_type == hi1* ]
       mount -o $EXT4_MOUNT_OPTS /dev/sdf /mnt2
     fi    
   fi
+elif [[ $instance_type == m5d* || $instance_type == r5d* || $instance_type == m5ad* || $instance_type == r5ad* ]]; then
+  EXT4_MOUNT_OPTS="defaults,noatime"
+  rm -rf /mnt*
+  mkdir /mnt
+  mkfs.xfs -f /dev/nvme1n1
+  mount -o $EXT4_MOUNT_OPTS /dev/nvme1n1 /mnt
+
+  if [[ $instance_type == *.4xlarge || $instance_type == *.8xlarge || $instance_type == *.12xlarge ]]; then
+    mkdir /mnt2
+    mkfs.xfs -f /dev/nvme2n1
+    mount -o $EXT4_MOUNT_OPTS /dev/nvme2n1 /mnt2
+  elif [[ $instance_type == *.16xlarge || $instance_type == *.24xlarge ]]; then
+    mkdir /mnt2
+    mkfs.xfs -f /dev/nvme2n1
+    mount -o $EXT4_MOUNT_OPTS /dev/nvme2n1 /mnt2
+
+    mkdir /mnt3
+    mkfs.xfs -f /dev/nvme3n1
+    mount -o $EXT4_MOUNT_OPTS /dev/nvme3n1 /mnt3
+
+    mkdir /mnt4
+    mkfs.xfs -f /dev/nvme4n1
+    mount -o $EXT4_MOUNT_OPTS /dev/nvme4n1 /mnt4
+  fi
 fi
 
 # Mount options to use for ext3 and xfs disks (the ephemeral disks
