@@ -53,7 +53,7 @@ if [[ $instance_type == r3* || $instance_type == i2* || $instance_type == hi1* ]
       mount -o $EXT4_MOUNT_OPTS /dev/sdf /mnt2
     fi    
   fi
-elif [[ $instance_type == m5d* || $instance_type == r5d* || $instance_type == m5ad* || $instance_type == r5ad* ]]; then
+elif [[ $instance_type == m5d* || $instance_type == r5d* || $instance_type == m5ad* || $instance_type == r5ad* || $instance_type == c5ad* || $instance_type == c5d* ]]; then
   EXT4_MOUNT_OPTS="defaults,noatime"
   rm -rf /mnt*
   mkdir /mnt
